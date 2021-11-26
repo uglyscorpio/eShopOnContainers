@@ -5,6 +5,7 @@ trigger:
     include:
     - master
     - dev
+    - local
   paths:
     include:
     - src/BuildingBlocks/*
