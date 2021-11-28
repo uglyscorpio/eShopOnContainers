@@ -122,10 +122,16 @@ helm uninstall $(helm ls --filter eshop -q) --dry-run
 #  Project settings > Service connections.
 # Select + New service connection, select the type of service connection that you need, and then select Next.
 # create a new docker Registry service heigooRegistry with other docker registry option
-# using service principal id and password username/password: 7a304605-08fa-47e2-adea-49d529dcabc4/kv59J2RHiknv-v_uLzQIj37_zHjvX4QgZc
-
-
-
+# using service principal id and password username/password: 7a304605-08fa-47e2-adea-49d529dcabc4/kv59J2RHiknv-v_uLzQIj37_zHjvX4QgZc(see below for how to create a new service account)
+#  create a new k8s service connection using kubeconfig and select k8s service connection while setting up release pipeline( with differnt subscription with the k8s cluster, if the same can select azure resource manager to connect k8s cluster)
+az aks get-credentials --resource-group DL-LEARNING-RG --name eShop --file kubeconfig
+# build pipeline: change registryEndport with the docker registry service connection created aboved ,included new branch and comment out multiarch jobs
+# in release pipeline:  2 step helm install（3.7.1）  and upgrade， line Namespace: $(namespace),command upgrade(helm) chart type FilePath, Chart Path $(System.DefaultWorkingDirectory)/_buildSource/helm/$(chartName)( all the artificts alias can be renamed as the same _buildSource)
+# Release Name $(appName)-$(chartName)
+# set values: app.name=$(appName),inf.k8s.dns=$(dns),image.repository=$(acr)eshop/identity.api,image.tag=linux-$(Release.Artifacts._buildSource.SourceBranchName),image.pullPolicy=$(pullPolicy),inf.tls.enabled=$(sslEnabled),ingress.tls[0].secretName=$(tlsSecretName),ingress.tls[0].hosts={$(dns)},inf.tls.issuer=$(sslIssuer),ingress.hosts={$(dns)},inf.mesh.enabled=$(useMesh)
+#Install if release not present and wait checked
+#Arguments: -f $(System.DefaultWorkingDirectory)/_buildSource/helm/app.yaml -f $(System.DefaultWorkingDirectory)/_buildSource/helm/inf.yaml -f $(System.DefaultWorkingDirectory)/_buildSource/helm/ingress_values.yaml  --timeout 600s --debug
+	
 
 
 
